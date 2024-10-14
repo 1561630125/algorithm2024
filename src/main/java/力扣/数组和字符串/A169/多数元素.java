@@ -1,4 +1,4 @@
-package 力扣.A169;
+package 力扣.数组和字符串.A169;
 
 import java.util.Arrays;
 import java.util.HashMap;

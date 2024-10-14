@@ -1,4 +1,4 @@
-package 力扣.A88;
+package 力扣.数组和字符串.A88;
 
 import java.util.Arrays;
 

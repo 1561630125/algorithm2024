@@ -1,4 +1,4 @@
-package 力扣.A27;
+package 力扣.数组和字符串.A27;
 
 /**
  * description
