@@ -1,4 +1,4 @@
-package 力扣.数组和字符串.A125;
+package 力扣.双指针.A125;
 
 /**
  * description
