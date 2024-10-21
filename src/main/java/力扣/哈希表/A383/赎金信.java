@@ -5,7 +5,7 @@ package 力扣.哈希表.A383;
  *
  * @author faming.yang@hand-china.com 2024-10-21 19:46
  */
-public class A383 {
+public class 赎金信 {
     public boolean canConstruct(String ransomNote, String magazine) {
         if (ransomNote.length() > magazine.length()) {
             return false;
