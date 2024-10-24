@@ -65,4 +65,7 @@ public class 找出字符串中第一个匹配项的下标 {
         return -1;
     }
 
+
+    //Manacher's Algorithm 马拉车算法，在一个字符串中找出最长回文子串
+    //https://blog.csdn.net/u014771464/article/details/79120964
 }
