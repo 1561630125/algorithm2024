@@ -7,7 +7,7 @@ package 力扣.矩阵.A73;
  */
 public class 矩阵置零 {
 
-    //使用标记数组
+    //使用标记数组，比较好理解
     public void setZeroes(int[][] matrix) {
         int m = matrix.length, n = matrix[0].length;
         boolean[] row = new boolean[m];
