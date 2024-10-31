@@ -1,4 +1,4 @@
-package 力扣.数学.A190;
+package 力扣.位运算.A190;
 
 /**
  * description
