@@ -1,4 +1,4 @@
-package 力扣.数组和字符串.A42;
+package 力扣.多维动态规划.A42;
 
 import java.util.Deque;
 import java.util.LinkedList;

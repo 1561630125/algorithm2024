@@ -1,4 +1,4 @@
-package 力扣.动态规划.A300;
+package 力扣.一维动态规划.A300;
 
 /**
  * description
@@ -15,7 +15,7 @@ class Solution {
         if (nums.length == 0) {
             return 0;
         }
-        int[] dp = new int[nums.length];
+        int[] dp = new int[nums.length]; //定义 dp[i] 为考虑前 i 个元素，以第 i 个数字结尾的最长上升子序列的长度，注意 nums[i] 必须被选取
         dp[0] = 1;
         int maxans = 1;
         for (int i = 1; i < nums.length; i++) {
