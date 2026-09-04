@@ -1,4 +1,4 @@
-package OD.贪心和动态规划;
+package OD.基础与模拟;
 
 import java.util.Arrays;
 
