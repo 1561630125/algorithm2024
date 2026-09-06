@@ -27,7 +27,6 @@ public class 矩形绘制面积 {
                     grid[x][y] = types.charAt(index) == 'd'; // 绘制
                 }
             }
-
         }
 
         int area = 0;
