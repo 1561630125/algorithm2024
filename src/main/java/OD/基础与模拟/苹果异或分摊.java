@@ -20,7 +20,7 @@ public class 苹果异或分摊 {
      * @param weights 整数数组，表示每个苹果的重量
      * @return 如果可行，返回较大一堆的最大总重量；否则返回 -1
      */
-    int maxAppleShare(int[] weights) {
+    static int maxAppleShare(int[] weights) {
         int xorSum = 0;    // 所有苹果重量的异或值
         int total = 0;     // 所有苹果的总重量
         int minimum = weights[0];  // 最轻苹果的重量，初始为第一个元素
@@ -35,6 +35,12 @@ public class 苹果异或分摊 {
         // 如果总异或值不为 0，则无法分成两堆异或值相等，返回 -1
         // 如果总异或值为 0，则最大的一堆重量 = 总重量 - 最轻苹果的重量
         return xorSum == 0 ? total - minimum : -1;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(11 ^ 3);
+
+        System.out.println(maxAppleShare(new int[]{6, 5, 3}));
     }
 
 }
