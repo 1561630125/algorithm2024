@@ -1,4 +1,4 @@
-package OD.基础与模拟.数据结构与区间;
+package OD.数据结构与区间;
 
 import java.util.Arrays;
 
