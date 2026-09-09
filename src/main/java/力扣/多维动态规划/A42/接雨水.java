@@ -12,7 +12,7 @@ public class 接雨水 {
 
     //动态规划，对于下标 i，下雨后水能到达的最大高度等于下标 i 两边的最大高度的最小值，
     // 下标 i 处能接的雨水量等于下标 i 处的水能到达的最大高度减去 height[i]
-    public int trap(int[] height) {
+    static public int trap(int[] height) {
         int n = height.length;
         if (n == 0) {
             return 0;
@@ -89,8 +89,12 @@ public class 接雨水 {
 
 
     public static void main(String[] args) {
-        int[] nums = new int[]{2,1,2};
-        System.out.println(trap3(nums));
+        int[] nums = new int[]{1, 0, 2};
+
+        int[] nums2 = new int[]{1, 0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 5, 5, 0, 5};
+        System.out.println(trap(nums));
+
+        System.out.println(trap(nums2));
     }
 
 
