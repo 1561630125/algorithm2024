@@ -1,5 +1,8 @@
 package OD.数据结构与区间;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 /**
  * description
  *
@@ -236,6 +239,7 @@ public class 分数表达式 {
             }
 
             // ========== 工具方法：跳过空格 ==========
+
             /**
              * 跳过表达式中的空白字符
              */
@@ -246,11 +250,180 @@ public class 分数表达式 {
         }
     }
 
+
+    static class Solution2 {
+
+        String evaluateFractionExpression(String expression) {
+            try {
+                long[] value = evaluate(expression);
+                return value[1] == 1
+                        ? Long.toString(value[0])
+                        : value[0] + "/" + value[1];
+            } catch (RuntimeException e) {
+                return "ERROR";
+            }
+        }
+
+        /**
+         * 双栈求值：操作数栈 + 操作符栈
+         */
+        private long[] evaluate(String expression) {
+            Deque<long[]> operands = new ArrayDeque<>();   // 操作数栈（分数）
+            Deque<Character> operators = new ArrayDeque<>(); // 操作符栈
+
+            int i = 0;
+            int n = expression.length();
+
+            while (i < n) {
+                char c = expression.charAt(i);
+
+                if (Character.isWhitespace(c)) {
+                    i++;
+                    continue;
+                }
+
+                // ===== 数字：解析成 [value, 1] =====
+                if (Character.isDigit(c)) {
+                    long num = 0;
+                    while (i < n && Character.isDigit(expression.charAt(i))) {
+                        num = num * 10 + expression.charAt(i++) - '0';
+                    }
+                    operands.push(new long[]{num, 1});
+                    continue;
+                }
+
+                // ===== 左括号：直接压栈 =====
+                if (c == '(') {
+                    operators.push(c);
+                    i++;
+                    continue;
+                }
+
+                // ===== 右括号：一直算到 '(' =====
+                if (c == ')') {
+                    while (!operators.isEmpty() && operators.peek() != '(') {
+                        apply(operands, operators.pop());
+                    }
+                    if (operators.isEmpty()) {
+                        throw new RuntimeException("括号不匹配");
+                    }
+                    operators.pop(); // 弹出 '('
+                    i++;
+                    continue;
+                }
+
+                // ===== 运算符：先算掉优先级 >= 当前的 =====
+                if (c == '+' || c == '-' || c == '*' || c == '/') {
+                    while (!operators.isEmpty()
+                            && operators.peek() != '('
+                            && precedence(operators.peek()) >= precedence(c)) {
+                        apply(operands, operators.pop());
+                    }
+                    operators.push(c);
+                    i++;
+                    continue;
+                }
+
+                // 非法字符
+                throw new RuntimeException("非法字符: " + c);
+            }
+
+            // ===== 收尾：清空操作符栈 =====
+            while (!operators.isEmpty()) {
+                if (operators.peek() == '(') {
+                    throw new RuntimeException("括号不匹配");
+                }
+                apply(operands, operators.pop());
+            }
+
+            if (operands.size() != 1) {
+                throw new RuntimeException("表达式非法");
+            }
+            return operands.pop();
+        }
+
+        /**
+         * 弹出一个运算符和两个操作数，计算后把结果压回操作数栈
+         */
+        private void apply(Deque<long[]> operands, char op) {
+            if (operands.size() < 2) {
+                throw new RuntimeException("操作数不足");
+            }
+            long[] right = operands.pop();  // 后进先出：先弹的是右操作数
+            long[] left = operands.pop();
+
+            long[] result;
+            switch (op) {
+                case '+':
+                    result = normalize(
+                            left[0] * right[1] + right[0] * left[1],
+                            left[1] * right[1]);
+                    break;
+                case '-':
+                    result = normalize(
+                            left[0] * right[1] - right[0] * left[1],
+                            left[1] * right[1]);
+                    break;
+                case '*':
+                    result = normalize(left[0] * right[0], left[1] * right[1]);
+                    break;
+                case '/':
+                    if (right[0] == 0) {
+                        throw new RuntimeException("除零");
+                    }
+                    result = normalize(left[0] * right[1], left[1] * right[0]);
+                    break;
+                default:
+                    throw new RuntimeException("未知运算符: " + op);
+            }
+            operands.push(result);
+        }
+
+        /**
+         * 运算符优先级
+         */
+        private int precedence(char op) {
+            if (op == '+' || op == '-') return 1;
+            if (op == '*' || op == '/') return 2;
+            return 0;
+        }
+
+        /**
+         * 约分到最简
+         */
+        private long[] normalize(long numerator, long denominator) {
+            if (denominator == 0) {
+                throw new RuntimeException("除零");
+            }
+            if (denominator < 0) {
+                numerator = -numerator;
+                denominator = -denominator;
+            }
+            long d = gcd(numerator, denominator);
+            return new long[]{numerator / d, denominator / d};
+        }
+
+        private long gcd(long a, long b) {
+            a = Math.abs(a);
+            b = Math.abs(b);
+            while (b != 0) {
+                long t = a % b;
+                a = b;
+                b = t;
+            }
+            return a == 0 ? 1 : a;
+        }
+    }
+
+
     public static void main(String[] args) {
 
         Solution solution = new Solution();
+        Solution2 solution2 = new Solution2();
 
-        System.out.println(solution.evaluateFractionExpression("1*"));
+        System.out.println(solution.evaluateFractionExpression("2+6*8/9"));
+
+        System.out.println(solution2.evaluateFractionExpression("2+6*8/9"));
     }
 
 }
