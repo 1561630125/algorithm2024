@@ -152,6 +152,51 @@ public class Combination {
     }
 
 
+    public class PermutationK2 {
+        public List<List<Integer>> permute(int[] nums) {
+            List<List<Integer>> result = new ArrayList<>();
+            backtrack(nums, 0, result);
+            return result;
+        }
+
+        private void backtrack(int[] nums, int start, List<List<Integer>> result) {
+            if (start == nums.length) {
+                List<Integer> temp = new ArrayList<>();
+                for (int v : nums) temp.add(v);
+                result.add(temp);
+                return;
+            }
+
+            for (int i = start; i < nums.length; i++) {
+                swap(nums, start, i);          // 把第 i 个换到 start 位置
+                backtrack(nums, start + 1, result);
+                swap(nums, start, i);          // 回溯
+            }
+        }
+
+
+        private void backtrack(int[] nums, int start, int k, List<List<Integer>> result) {
+            if (start == k) {
+                List<Integer> temp = new ArrayList<>();
+                for (int i = 0; i < k; i++) temp.add(nums[i]);
+                result.add(temp);
+                return;
+            }
+            for (int i = start; i < nums.length; i++) {
+                swap(nums, start, i);
+                backtrack(nums, start + 1, k, result);
+                swap(nums, start, i);
+            }
+        }
+
+        private void swap(int[] a, int i, int j) {
+            int t = a[i];
+            a[i] = a[j];
+            a[j] = t;
+        }
+    }
+
+
     public class NextPermutation {
 
         /**
