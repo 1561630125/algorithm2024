@@ -105,7 +105,7 @@ public class 下一个高级优先包 {
         int[] answer = new int[dataPacket.length];
 
         // 2. 对每个权重分组，单独用单调栈求「下一个更大的 pri」
-        /*for (java.util.List<int[]> packets : groups.values()) {
+        for (java.util.List<int[]> packets : groups.values()) {
 
             // 栈里存的是「还没找到下一个更大 pri」的包
             // 从栈底到栈顶，pri 严格递减
@@ -126,8 +126,8 @@ public class 下一个高级优先包 {
 
             // 循环结束后栈里剩下的包都没找到更大的 pri
             // answer 对应位置保持默认值 0
-        }*/
-
+        }
+/*
         for (java.util.List<int[]> packets : groups.values()) {
             java.util.ArrayDeque<int[]> stack = new java.util.ArrayDeque<>();
             for (int[] packet : packets) {
@@ -138,7 +138,7 @@ public class 下一个高级优先包 {
             }
 
             System.out.println("---");
-        }
+        }*/
 
         return answer;
     }
