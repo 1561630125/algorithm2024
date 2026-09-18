@@ -3,7 +3,7 @@ package OD.搜索与枚举;
 import java.util.Arrays;
 
 /**
- * description
+ * 这个题目挺好的，结合了组合
  *
  * @author faming.yang@hand-china.com 2026-09-10 23:00
  */

@@ -365,12 +365,12 @@ public class 练习 {
         }
 
         private void combine(int start, int n, int k,
-                               List<Integer> path, List<List<Integer>> result) {
+                             List<Integer> path, List<List<Integer>> result) {
             if (path.size() == k) result.add(new ArrayList<>(path));
 
-            for(int i = start; i <= n - (k - path.size()) + 1; i++) {
+            for (int i = start; i <= n - (k - path.size()) + 1; i++) {
                 path.add(i);
-                combine(i + 1, n ,k,path,result);
+                combine(i + 1, n, k, path, result);
                 path.remove(path.size() - 1);
             }
         }
@@ -402,13 +402,102 @@ public class 练习 {
     }
 
     // 位运算 & 掩码
-    class so18{
+    class so18 {
 
     }
 
     //前缀和 & 后缀和
-    class so19{
+    class so19 {
 
+    }
+
+    // LRU
+    class so20 {
+        class LRUCache<K, V> {
+            class Node {
+                K key;
+                V value;
+                LRUCache.Node prev;
+                LRUCache.Node next;
+
+                Node(K key, V value) {
+                    this.key = key;
+                    this.value = value;
+                }
+            }
+
+            private final int capacity;
+            private final Map<K, LRUCache.Node> cache;
+            private final LRUCache.Node head;  // 伪头节点
+            private final LRUCache.Node tail;  // 伪尾节点
+
+            public LRUCache(int capacity) {
+                if (capacity <= 0) {
+                    throw new IllegalArgumentException("Capacity must be positive");
+                }
+                this.capacity = capacity;
+                this.cache = new HashMap<>();
+                this.head = new LRUCache.Node(null, null);
+                this.tail = new LRUCache.Node(null, null);
+                head.next = tail;
+                tail.prev = head;
+            }
+
+            // 添加到头部
+            private void addToHead(LRUCache.Node node) {
+                node.prev = head;
+                node.next = head.next.next;
+                head.next.prev = node;
+                head.next = node;
+            }
+
+            //移除节点
+            private void removeNode(LRUCache.Node node) {
+                node.prev.next = node.next;
+                node.next.prev = node.prev;
+            }
+
+            private void moveToHead(LRUCache.Node node) {
+                addToHead(node);
+                removeNode(node);
+            }
+
+            private LRUCache.Node removeTail() {
+                Node node = tail.prev;
+                removeNode(node);
+                return node;
+            }
+
+            public V get(K key) {
+                Node node = cache.get(key);
+                if (node == null) {
+                    return null;
+                }
+                moveToHead(node);
+                return node.value;
+            }
+
+            public void put(K key, V value) {
+                if (cache.containsKey(key)) {
+                    Node node = cache.get(key);
+                    node.value = value;
+                    moveToHead(node);
+                } else {
+                    Node node = new Node(key, value);
+                    if (cache.size() > capacity) {
+                        Node removeTail = removeTail();
+                        cache.remove(removeTail.key);
+                    }
+                    cache.put(key, node);
+                    addToHead(node);
+                }
+            }
+        }
+
+        // 邻接表 & 出度|入度
+        class so21 {
+
+        }
     }
 
 }

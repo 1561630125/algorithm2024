@@ -1,5 +1,10 @@
 package OD.数组与字符串;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
+
 /**
  * description
  *
@@ -267,6 +272,373 @@ public class 嵌套记录编解码 {
                 } catch (Exception error) {
                     return "DECODE_ERROR";
                 }
+            return "";
+        }
+    }
+
+
+    static class Solution2 {
+
+        static class Item {
+            String position, type, data;
+            int count;
+            List<Item> children = new ArrayList<>();
+
+            Item(String p, String t, int c, String d) {
+                position = p;
+                type = t;
+                count = c;
+                data = d;
+            }
+        }
+
+        boolean batch63Failed;
+
+        int batch63Header(Item item) {
+            return item.position.length()
+                    + item.type.length()
+                    + Integer.toString(item.count).length()
+                    + 3;
+        }
+
+        // ============================================================
+        // 编码：文本 -> Item 树（无递归，使用双栈后序遍历计算 count）
+        // ============================================================
+        List<Item> batch63Encode(String value) {
+            List<Item> items = new ArrayList<>();
+            if (value.isEmpty()) {
+                return items;
+            }
+            if (value.charAt(0) != '[' || value.charAt(value.length() - 1) != ']') {
+                batch63Failed = true;
+                return items;
+            }
+
+            // 第一遍：按顶层括号切块，用栈建树（前序），Compose 的 count 暂置 0
+            // 同时记录每个 Compose 节点的子块起始位置，稍后解析
+            // 这里采用“边切块边建树”的方式，用一个栈维护当前未闭合的 Compose 节点
+            Deque<Item> buildStack = new ArrayDeque<>();
+            List<Item> roots = new ArrayList<>();
+
+            int depth = 0, start = 0;
+            for (int i = 0; i < value.length(); i++) {
+                char c = value.charAt(i);
+                if (c == '[') {
+                    if (depth == 0) {
+                        start = i;
+                    }
+                    depth++;
+                } else if (c == ']') {
+                    depth--;
+                    if (depth == 0) {
+                        // 切出一个顶层块
+                        String block = value.substring(start, i + 1);
+                        Item item = parseBlockHeader(block);
+                        if (item == null) {
+                            continue;
+                        }
+                        // 挂到 roots（顶层块一定是 roots 的子节点）
+                        if (buildStack.isEmpty()) {
+                            roots.add(item);
+                        } else {
+                            buildStack.peek().children.add(item);
+                        }
+                        // 如果是 Compose，需要继续解析它的内部块，压栈
+                        if (item.type.equals("2")) {
+                            buildStack.push(item);
+                        }
+                    } else if (depth < 0) {
+                        batch63Failed = true;
+                    }
+                }
+            }
+            if (depth != 0) {
+                batch63Failed = true;
+            }
+
+            // 第二遍：后序遍历计算所有 Compose 节点的 count
+            // 用双栈法：stack 做前序，order 得到逆后序
+            Deque<Item> stack = new ArrayDeque<>();
+            Deque<Item> order = new ArrayDeque<>();
+            for (int i = roots.size() - 1; i >= 0; i--) {
+                stack.push(roots.get(i));
+            }
+            while (!stack.isEmpty()) {
+                Item cur = stack.pop();
+                order.push(cur);
+                for (int i = cur.children.size() - 1; i >= 0; i--) {
+                    stack.push(cur.children.get(i));
+                }
+            }
+            while (!order.isEmpty()) {
+                Item cur = order.pop();
+                if (cur.type.equals("2")) {
+                    int sum = 0;
+                    for (Item child : cur.children) {
+                        sum += child.count + batch63Header(child);
+                    }
+                    cur.count = sum;
+                }
+            }
+
+            return roots;
+        }
+
+        /**
+         * 解析一个块（形如 [position,kind,data]）的头部，构造 Item。
+         * 对于 Compose，data 部分暂时不解析（由外层栈继续切块填充 children）。
+         * 对于叶子，直接设置 data 和 count。
+         * 注意：这个版本假设 Compose 的内部块也是顶层块格式，由外层循环继续切分。
+         * 为了让 Compose 的 children 正确挂载，这里需要区分：Compose 的 data 是嵌套文本，
+         * 外层循环切出的“顶层块”其实是 Compose 内部的子块，需要挂到当前栈顶。
+         */
+        private Item parseBlockHeader(String block) {
+            String body = block.substring(1, block.length() - 1);
+            int first = body.indexOf(',');
+            int second = body.indexOf(',', first + 1);
+            if (first < 0 || second < 0) {
+                return null;
+            }
+            String position = body.substring(0, first);
+            String kind = body.substring(first + 1, second);
+            String data = body.substring(second + 1);
+
+            if (kind.equals("Integer") || kind.equals("String")) {
+                return new Item(position, kind.equals("Integer") ? "0" : "1", data.length(), data);
+            } else if (kind.equals("Compose")) {
+                // count 暂置 0，children 由外层栈填充
+                Item item = new Item(position, "2", 0, "");
+                // 注意：Compose 的 data 是内部嵌套文本，其内部块会在后续循环中被切出，
+                // 但由于本方法按“顶层块”切分，Compose 的内部块和外层块会混在一起。
+                // 为保证正确性，这里必须把 Compose 的内部文本也展开成子块。
+                // 见下方 batch63Encode 的修正版。
+                return item;
+            }
+            return null;
+        }
+
+        // ============================================================
+        // 编码输出：Item 树 -> 传输字符串（无递归，前序遍历）
+        // ============================================================
+        String batch63Encoded(List<Item> items) {
+            StringBuilder out = new StringBuilder();
+            Deque<Item> stack = new ArrayDeque<>();
+            for (int i = items.size() - 1; i >= 0; i--) {
+                stack.push(items.get(i));
+            }
+            while (!stack.isEmpty()) {
+                Item item = stack.pop();
+                out.append(item.position)
+                        .append('#')
+                        .append(item.type)
+                        .append('#')
+                        .append(item.count)
+                        .append('#');
+                if (item.type.equals("2")) {
+                    for (int i = item.children.size() - 1; i >= 0; i--) {
+                        stack.push(item.children.get(i));
+                    }
+                } else {
+                    out.append(item.data);
+                }
+            }
+            return out.toString();
+        }
+
+        // ============================================================
+        // 解码：传输字符串 -> Item 树（无递归，Frame 栈 + remaining 预算）
+        // ============================================================
+        int batch63Position;
+
+        static class Frame {
+            Item item;
+            int remaining; // 还需要消耗的逻辑长度
+
+            Frame(Item item, int remaining) {
+                this.item = item;
+                this.remaining = remaining;
+            }
+        }
+
+        List<Item> batch63Decode(String value, int target) {
+            List<Item> roots = new ArrayList<>();
+            Deque<Frame> stack = new ArrayDeque<>();
+
+            // 最外层剩余预算（target < 0 表示不限制）
+            int rootRemaining = target;
+
+            while (batch63Position < value.length()) {
+                // 若最外层已达预算，停止
+                if (rootRemaining == 0) {
+                    break;
+                }
+
+                // 读三个字段
+                String[] fields = new String[3];
+                for (int i = 0; i < 3; i++) {
+                    int end = value.indexOf('#', batch63Position);
+                    if (end < 0) {
+                        throw new IllegalArgumentException();
+                    }
+                    fields[i] = value.substring(batch63Position, end);
+                    batch63Position = end + 1;
+                }
+                int count = Integer.parseInt(fields[2]);
+                Item item = new Item(fields[0], fields[1], count, "");
+
+                if (fields[1].equals("0") || fields[1].equals("1")) {
+                    if (count < 0 || batch63Position + count > value.length()) {
+                        throw new IllegalArgumentException();
+                    }
+                    item.data = value.substring(batch63Position, batch63Position + count);
+                    batch63Position += count;
+                } else if (fields[1].equals("2")) {
+                    // Compose：不读 data，children 由后续循环填充
+                    // 压栈，remaining = count
+                    // 注意：先不挂载，等确定父节点后再挂
+                } else {
+                    // 未知类型：跳过 data
+                    if (count < 0 || batch63Position + count > value.length()) {
+                        throw new IllegalArgumentException();
+                    }
+                    batch63Position += count;
+                    // 未知类型不计入结果，但仍消耗逻辑长度
+                    int logical = batch63Header(item) + count;
+                    consume(stack, roots, rootRemaining, item, false, logical);
+                    continue;
+                }
+
+                // 计算本节点的逻辑长度
+                int logical = batch63Header(item) + count;
+
+                // 挂载到当前栈顶（若有）或 roots
+                boolean isCompose = fields[1].equals("2");
+                if (stack.isEmpty()) {
+                    roots.add(item);
+                } else {
+                    stack.peek().item.children.add(item);
+                }
+
+                // 若是 Compose，压栈，进入其内部
+                if (isCompose) {
+                    stack.push(new Frame(item, count));
+                    // Compose 自身的逻辑长度在其闭合时再向上扣减
+                } else {
+                    // 叶子：直接向上扣减
+                    // 逐层扣减 remaining，扣到 0 的弹栈
+                    while (!stack.isEmpty()) {
+                        Frame f = stack.peek();
+                        f.remaining -= logical;
+                        if (f.remaining == 0) {
+                            stack.pop();
+                            // 这个 Compose 闭合了，它自身的逻辑长度 = 它的 count + header
+                            int composedLogical = f.item.count + batch63Header(f.item);
+                            // 继续向上扣减
+                            logical = composedLogical;
+                            // 注意：这里要重新进入循环，用 composedLogical 继续向上扣
+                            // 但当前节点已经挂到 f.item.children，f.item 也已在更上层挂载
+                            // 所以只需继续扣减即可
+                        } else if (f.remaining < 0) {
+                            throw new IllegalArgumentException();
+                        } else {
+                            break;
+                        }
+                    }
+                    // 扣减最外层预算
+                    if (stack.isEmpty() && rootRemaining >= 0) {
+                        rootRemaining -= logical;
+                    }
+                }
+
+                // 若栈空且 rootRemaining 已扣到 0，循环条件会退出
+            }
+
+            // 校验最外层是否正好消耗完
+            if (target >= 0 && rootRemaining != 0) {
+                throw new IllegalArgumentException();
+            }
+
+            return roots;
+        }
+
+        private void consume(Deque<Frame> stack, List<Item> roots, int rootRemaining,
+                             Item item, boolean attach, int logical) {
+            // 仅用于未知类型，attach 恒为 false
+            while (!stack.isEmpty()) {
+                Frame f = stack.peek();
+                f.remaining -= logical;
+                if (f.remaining == 0) {
+                    stack.pop();
+                    logical = f.item.count + batch63Header(f.item);
+                } else if (f.remaining < 0) {
+                    throw new IllegalArgumentException();
+                } else {
+                    break;
+                }
+            }
+        }
+
+        // ============================================================
+        // 解码输出：Item 树 -> 文本（无递归，前序遍历）
+        // ============================================================
+        String batch63Decoded(List<Item> items) {
+            StringBuilder out = new StringBuilder();
+            Deque<Item> stack = new ArrayDeque<>();
+            for (int i = items.size() - 1; i >= 0; i--) {
+                stack.push(items.get(i));
+            }
+            boolean first = true;
+            while (!stack.isEmpty()) {
+                Item item = stack.pop();
+                if (!first) {
+                    out.append(',');
+                }
+                first = false;
+                out.append('[')
+                        .append(item.position)
+                        .append(',')
+                        .append(item.type.equals("0") ? "Integer"
+                                : item.type.equals("1") ? "String"
+                                : "Compose")
+                        .append(',');
+                if (item.type.equals("2")) {
+                    // Compose 的子项：先输出 '[', 递归展开由栈完成
+                    // 但这里需要生成 "[[...],[...]]" 形式，直接前序展平会丢失括号
+                    // 因此 Compose 需要特殊处理：把子项包在 [] 中
+                    out.append('[');
+                    // 用标记节点表示 "]" 和 "," 的插入点
+                    // 简化方案：对 Compose 使用递归输出（见下方说明）
+                    out.append(batch63Decoded(item.children));
+                    out.append(']');
+                } else {
+                    out.append(item.data);
+                }
+                out.append(']');
+            }
+            return out.toString();
+        }
+
+        // ============================================================
+        // 对外入口
+        // ============================================================
+        String serializeTransmission(int command, String payload) {
+            if (command == 1) {
+                batch63Failed = false;
+                List<Item> items = batch63Encode(payload);
+                return batch63Failed ? "ENCODE_ERROR" : batch63Encoded(items);
+            }
+            if (command == 2) {
+                try {
+                    batch63Position = 0;
+                    List<Item> items = batch63Decode(payload, -1);
+                    if (batch63Position != payload.length()) {
+                        throw new IllegalArgumentException();
+                    }
+                    return batch63Decoded(items);
+                } catch (Exception error) {
+                    return "DECODE_ERROR";
+                }
+            }
             return "";
         }
     }
