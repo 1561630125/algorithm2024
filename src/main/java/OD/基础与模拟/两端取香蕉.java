@@ -28,16 +28,32 @@ public class 两端取香蕉 {
     }
 
     static long maxBananas2(long[] numbers, int picks) {
+        // ---------- 1. 边界检查 ----------
+        // picks < 0 或 picks > 数组长度 → 非法，返回 0
         if (numbers == null || picks < 0 || picks > numbers.length)
             return 0;
+
+        // ---------- 2. 初始窗口：取最右边的 picks 个 ----------
+        // 即 left = 0 的情况：头部取 0 个，尾部取 picks 个
         long current = 0;
         for (int index = numbers.length - picks; index < numbers.length; index++)
             current += numbers[index];
-        long best = current;
+
+        long best = current;   // 当前最优
+
+        // ---------- 3. 枚举 left = 1 到 picks ----------
+        // left 表示"从头部取几个"
+        // 尾部取 picks - left 个
         for (int left = 1; left <= picks; left++) {
+
+            // 滑动窗口左移一位：
+            //   加入 numbers[left - 1]（头部新加入的）
+            //   移除 numbers[numbers.length - picks + left - 1]（尾部退出的）
             current += numbers[left - 1] - numbers[numbers.length - picks + left - 1];
+
             best = Math.max(best, current);
         }
+
         return best;
     }
 

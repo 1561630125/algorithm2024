@@ -27,7 +27,7 @@ public class 七位分组编码 {
      * @param value 要编码的大整数（非负）
      * @return 十六进制编码字符串
      */
-    String encodeInteger(BigInteger value) {
+    static String encodeInteger(BigInteger value) {
         // 十六进制字符表
         final char[] hex = "0123456789ABCDEF".toCharArray();
 
@@ -67,6 +67,10 @@ public class 七位分组编码 {
         } while (value.signum() != 0);  // 当 value 还有值时继续
 
         return result.toString();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(encodeInteger(BigInteger.valueOf(10)));
     }
 
 }

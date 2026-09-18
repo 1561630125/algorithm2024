@@ -93,7 +93,11 @@ public class 字符进制转换 {
 
     public static void main(String[] args) {
 
-        System.out.println(digitConvert("zz","0123456789abcdefghijklmnopqrstuvwxyz","0123456789"));
+        System.out.println(digitConvert("zz", "0123456789abcdefghijklmnopqrstuvwxyz", "0123456789"));
+
+
+        System.out.println(digitConvert("10", "0123456789", "0123456789ABCDEF"));
+        System.out.println(digitConvert("10", "999", "0123456789ABCDEF"));
 
     }
 

@@ -1,7 +1,15 @@
 package OD.基础与模拟;
 
+import java.util.Arrays;
+
 /**
- * description
+ * 排序：每个端口组先排序，方便用双指针判断是否有两个相同端口。
+ * <p>
+ * 判断关联：portSharesTwo 用双指针判断两个已排序数组是否至少有两个相同元素。
+ * <p>
+ * 合并：只要两个组关联，就把它们合并、排序，并继续扫描，直到没有可合并的组。
+ * <p>
+ * 去重：最后对每个合并后的组去重，返回结果。
  *
  * @author faming.yang@hand-china.com 2026-09-05 14:29
  */
@@ -10,11 +18,12 @@ public class 端口组合并 {
     /**
      * 判断两个已排序的端口数组是否存在至少2个相同的端口
      * 前提：两个数组都已经升序排序
+     *
      * @param first  第一个端口组（已排序）
      * @param second 第二个端口组（已排序）
      * @return true 表示有2个及以上相同端口，需要合并
      */
-    private boolean portSharesTwo(long[] first, long[] second) {
+    static private boolean portSharesTwo(long[] first, long[] second) {
         int left = 0, right = 0, matched = 0;
         // 双指针遍历两个有序数组，类似归并排序中的比较
         while (left < first.length && right < second.length) {
@@ -35,14 +44,15 @@ public class 端口组合并 {
 
     /**
      * 合并所有满足条件的端口组
+     *
      * @param groups 输入的二维数组，每个子数组是一个端口组
      * @return 合并后的端口组二维数组
      */
-    long[][] mergeAssociatedPortGroups(long[][] groups) {
+    static long[][] mergeAssociatedPortGroups(long[][] groups) {
         // ========== 第1步：输入校验 ==========
         // M（端口组个数）必须在1~10之间
         if (groups.length < 1 || groups.length > 10)
-            return new long[][] {new long[0]};  // 返回 [[]]
+            return new long[][]{new long[0]};  // 返回 [[]]
 
         java.util.ArrayList<long[]> values = new java.util.ArrayList<>();
 
@@ -107,7 +117,8 @@ public class 端口组合并 {
     }
 
     public static void main(String[] args) {
-
+        long[][] groups = new long[][]{{1, 2, 3}, {2, 3, 4}, {2, 7}};
+        System.out.println(Arrays.deepToString(mergeAssociatedPortGroups(groups)));
     }
 
 }

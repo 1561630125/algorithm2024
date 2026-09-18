@@ -53,3 +53,73 @@ public class 不等式验算 {
     }
 
 }
+
+
+class Solution2 {
+    String evaluateInequalities(double[][] coefficients, int[] variables, double[] targets,
+                                String[] operators) {
+        int rows = coefficients.length;
+
+        // ---------- 1. 边界检查 ----------
+        // 没有不等式，或 targets/operators 行数不匹配 → 返回 false 0
+        if (rows == 0 || targets.length != rows || operators.length != rows)
+            return "false 0";
+
+        // differences[row] 保存第 row 个不等式的 "左边 - 右边"
+        double[] differences = new double[rows];
+
+        // ---------- 2. 计算每个不等式的差值 ----------
+        for (int row = 0; row < rows; row++) {
+            // 系数个数不能超过变量个数
+            if (coefficients[row].length > variables.length)
+                return "false 0";
+
+            double value = 0;
+            // 计算左边：Σ coefficients[row][col] * variables[col]
+            for (int column = 0; column < coefficients[row].length; column++)
+                value += coefficients[row][column] * variables[column];
+
+            // 差值 = 左边 - 目标值
+            differences[row] = value - targets[row];
+        }
+
+        // ---------- 3. 检查是否所有不等式都满足 ----------
+        boolean satisfied = true;
+        for (int row = 0; row < rows; row++)
+            if (!satisfies(differences[row], operators[row])) {
+                satisfied = false;
+                break;   // 只要有一个不满足，整体就 false
+            }
+
+        // ---------- 4. 求所有差值的最大值 ----------
+        double maximum = differences[0];
+        for (double difference : differences)
+            maximum = Math.max(maximum, difference);
+
+        // ---------- 5. 输出结果 ----------
+        // 格式："true 最大值" 或 "false 最大值"
+        // (int)maximum 把最大值转成整数
+        return (satisfied ? "true" : "false") + " " + (int) maximum;
+    }
+
+    /**
+     * 判断差值 value 是否满足给定的运算符
+     *
+     * @param value    左边 - 右边
+     * @param operator 运算符字符串
+     * @return 是否满足
+     */
+    private boolean satisfies(double value, String operator) {
+        if (operator.equals(">"))
+            return value > 0;       // 左边 > 右边
+        if (operator.equals(">="))
+            return value >= 0;      // 左边 >= 右边
+        if (operator.equals("<"))
+            return value < 0;       // 左边 < 右边
+        if (operator.equals("<="))
+            return value <= 0;      // 左边 <= 右边
+        if (operator.equals("="))
+            return value == 0;      // 左边 == 右边
+        return false;               // 未知运算符
+    }
+}

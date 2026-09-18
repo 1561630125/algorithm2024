@@ -1,5 +1,7 @@
 package OD.基础与模拟;
 
+import java.util.Scanner;
+
 /**
  * description
  *
@@ -61,6 +63,44 @@ public class 错位或运算 {
          * 最终结果 = 有效交换方案数
          */
         return bothZero * ones + firstOneSecondZero * zeroes - bothZero * firstOneSecondZero;
+    }
+
+    public static class Main {
+        public static void main(String[] args) {
+            Scanner scanner = new Scanner(System.in);
+            int n = scanner.nextInt();
+            String num1 = scanner.next();
+            String num2 = scanner.next();
+
+            long count = 0;   // 计数：交换后或结果改变的方案数
+
+            // 枚举所有位置对 (i, j)，i < j
+            for (int i = 0; i < n; i++) {
+                for (int j = i + 1; j < n; j++) {
+
+                    // 1. 交换 num1 的 i 和 j 两位
+                    char[] swapped = num1.toCharArray();
+                    char temp = swapped[i];
+                    swapped[i] = swapped[j];
+                    swapped[j] = temp;
+
+                    // 2. 计算交换后的或结果，对比原结果
+                    boolean changed = false;
+                    for (int k = 0; k < n; k++) {
+                        char originalOr = (num1.charAt(k) == '1' || num2.charAt(k) == '1') ? '1' : '0';
+                        char newOr = (swapped[k] == '1' || num2.charAt(k) == '1') ? '1' : '0';
+                        if (originalOr != newOr) {
+                            changed = true;
+                            break;   // 只要有一位变了，就说明结果改变
+                        }
+                    }
+
+                    if (changed) count++;
+                }
+            }
+
+            System.out.println(count);
+        }
     }
 
     public static void main(String[] args) {

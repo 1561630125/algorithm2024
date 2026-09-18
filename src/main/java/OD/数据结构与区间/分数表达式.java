@@ -423,7 +423,13 @@ public class 分数表达式 {
 
         System.out.println(solution.evaluateFractionExpression("2+6*8/9"));
 
-        System.out.println(solution2.evaluateFractionExpression("2+6*8/9"));
+//        System.out.println(solution2.evaluateFractionExpression("2+6*8/9"));
+
+
+//        System.out.println(solution2.evaluateFractionExpression("(1+2)"));
+
+//        System.out.println(solution2.evaluateFractionExpression("1*2+3"));
+        System.out.println(solution2.evaluateFractionExpression("1+2*3"));
     }
 
 }

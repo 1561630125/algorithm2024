@@ -83,6 +83,8 @@ public class 采购单归并 {
                 // 例如：price=99, 99*9=891, (891+9)/10=900/10=90
                 // 向上取整确保不会因为整数除法损失优惠
                 finalPrice = (price * 9 + 9) / 10;
+                int v = (int) Math.ceil(price * 0.9);
+
             } else {
                 finalPrice = price;
             }

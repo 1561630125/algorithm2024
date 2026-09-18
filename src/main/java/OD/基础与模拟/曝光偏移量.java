@@ -1,7 +1,7 @@
 package OD.基础与模拟;
 
 /**
- * description
+ * 题目搞不懂，这种题目感觉没有意义
  *
  * @author faming.yang@hand-china.com 2026-09-05 16:21
  */

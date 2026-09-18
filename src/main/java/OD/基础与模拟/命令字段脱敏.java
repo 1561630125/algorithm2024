@@ -22,7 +22,7 @@ public class 命令字段脱敏 {
      * @param command 原始命令字符串，格式如 "field1_field2_field3" 或带引号的 "field1_"field2_with_underscore"_field3"
      * @return 脱敏后的命令字符串，如果索引无效则返回 "ERROR"
      */
-    String redactCommandField(int index, String command) {
+    static String redactCommandField(int index, String command) {
         // 使用动态数组存储解析出的各个字段
         ArrayList<String> fields = new ArrayList<>();
 
@@ -73,6 +73,12 @@ public class 命令字段脱敏 {
 
         // 使用下划线重新连接所有字段，返回脱敏后的命令
         return String.join("_", fields);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(redactCommandField(2, "copy_file_\"my_doc.txt\"_to_backup"));
+
+        System.out.println(redactCommandField(1, "copy_file_\"my_doc.txt\"_to_backup"));
     }
 
 

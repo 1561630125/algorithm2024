@@ -1,6 +1,9 @@
 package OD.树与图;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Stack;
 
 /**
  * description
@@ -24,7 +27,7 @@ public class 前序验树 {
             if (preorder == null || preorder.length == 0)
                 return new int[]{0, 0, 0};
 
-            long lower = Long.MIN_VALUE;   // 当前允许的最小值下界
+            /*long lower = Long.MIN_VALUE;   // 当前允许的最小值下界
             int[] stack = new int[preorder.length];
             int size = 0;
             java.util.Set<Integer> seen = new java.util.HashSet<>();
@@ -41,7 +44,24 @@ public class 前序验树 {
                     lower = stack[--size];
 
                 stack[size++] = value;
+            }*/
+
+            Set<Integer> seen = new HashSet<>();
+            Stack<Integer> stack = new Stack<>();   // 单调递减栈
+            long lower = Long.MIN_VALUE;
+
+            for (int value : preorder) {
+                // 重复 或 小于等于下界 → 非法
+                if (!seen.add(value) || value <= lower)
+                    return new int[]{0, 0, 0};
+
+                // 弹出所有比 value 小的栈顶，更新下界
+                while (!stack.isEmpty() && value > stack.peek())
+                    lower = stack.pop();
+
+                stack.push(value);
             }
+
 
             // ---------- 2. 根据前序序列重建树结构（左右孩子指针） ----------
             int[] left = new int[preorder.length];  // left[i] 和 right[i] 是两个数组，表示节点 i 的左/右孩子是谁：
