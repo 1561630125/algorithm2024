@@ -1,7 +1,10 @@
 package OD.数据结构与区间;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 /**
- * description
+ * 考点：单调栈合并区间
  *
  * @author faming.yang@hand-china.com 2026-09-09 14:54
  */
@@ -87,6 +90,63 @@ public class 路灯暗区 {
             result += leftStack[index] - rightStack[index - 1];
         }
         return result;
+    }
+
+    class Solution2 {
+
+        /**
+         * 计算"未照亮的道路总长度"。
+         * <p>
+         * 每个灯 i 照亮区间 [i*100 - radii[i], i*100 + radii[i]]。
+         * 区间可能重叠，需要合并成互不重叠的区间；
+         * 再累加相邻区间之间的空隙，即为未照亮长度。
+         * <p>
+         * 用单调栈（ArrayDeque 当栈）合并重叠区间：
+         * 新来一个区间，若与栈顶重叠，就弹出栈顶并合并，直到不重叠。
+         *
+         * @param radii 每个灯的照射半径
+         * @return 未照亮路段的总长度
+         */
+        long unlitRoadLength(long[] radii) {
+
+            // 0 个或 1 个灯 → 没有"相邻区间空隙"，返回 0
+            if (radii.length <= 1)
+                return 0L;
+
+            // 用 Deque 当栈，元素是 {left, right}
+            Deque<long[]> stack = new ArrayDeque<>();
+
+            for (int index = 0; index < radii.length; index++) {
+
+                // 当前灯照亮的区间
+                long left = index * 100L - radii[index];
+                long right = index * 100L + radii[index];
+
+                // ---------- 合并所有与当前区间重叠的栈顶 ----------
+                while (!stack.isEmpty() && stack.peek()[1] >= left) {
+                    long[] top = stack.pop();          // 弹出栈顶
+                    left = Math.min(left, top[0]);     // 合并左端
+                    right = Math.max(right, top[1]);   // 合并右端
+                }
+
+                // 合并后的区间入栈
+                stack.push(new long[]{left, right});
+            }
+
+            // ---------- 累加相邻区间之间的空隙 ----------
+            long result = 0L;
+            long[] previous = null;
+            // 栈是"后进先出"，遍历时需要按"入栈顺序"（从栈底到栈顶）
+            // ArrayDeque 的 descendingIterator() 可从栈底到栈顶遍历
+            for (java.util.Iterator<long[]> it = stack.descendingIterator(); it.hasNext(); ) {
+                long[] current = it.next();
+                if (previous != null)
+                    result += current[0] - previous[1];   // 当前左端 - 上一个右端
+                previous = current;
+            }
+
+            return result;
+        }
     }
 
 }

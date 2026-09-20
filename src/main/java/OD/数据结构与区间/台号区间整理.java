@@ -1,11 +1,11 @@
 package OD.数据结构与区间;
 
 /**
- * description
+ * 考点：滑动窗口
  *
  * @author faming.yang@hand-china.com 2026-09-10 17:27
  */
-public class 台间区号整理 {
+public class 台号区间整理 {
 
     static public String mergeStations(String stations) {
         // 1. 用 TreeSet 收集所有站点首字母，自动去重 + 升序排序

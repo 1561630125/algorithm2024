@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 /**
- * description
+ * 考点：单调栈
  *
  * @author faming.yang@hand-china.com 2026-09-10 16:02
  */

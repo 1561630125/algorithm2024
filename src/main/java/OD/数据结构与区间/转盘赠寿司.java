@@ -1,9 +1,11 @@
 package OD.数据结构与区间;
 
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Deque;
 
 /**
- * description
+ * 考点：单调栈+循环数组
  *
  * @author faming.yang@hand-china.com 2026-09-09 15:05
  */
@@ -94,6 +96,36 @@ public class 转盘赠寿司 {
         // ========== 4. 返回结果 ==========
         // 没有找到更小价格的元素，保持原价（已经在 result 中）
         return result;
+    }
+
+    class Solution2 {
+
+        long[] discountedSushiTotals(long[] prices) {
+            int count = prices.length;
+            long[] result = prices.clone();
+            if (count == 0)
+                return result;
+
+            // 用 Deque 当【栈】：push/pop/peek 都是栈语义
+            Deque<Integer> stack = new ArrayDeque<>();
+
+            // 环形遍历：走 count*2-1 步，覆盖"绕一圈"
+            for (int step = 0; step < count * 2 - 1; step++) {
+                int index = step % count;
+
+                // 遇到更小价格 → 弹出栈顶，配对打折
+                while (!stack.isEmpty() && prices[index] < prices[stack.peek()]) {
+                    int original = stack.pop();
+                    result[original] = prices[original] + prices[index];
+                }
+
+                // 第一圈才入栈（避免重复入栈）
+                if (step < count)
+                    stack.push(index);
+            }
+
+            return result;
+        }
     }
 
     public static void main(String[] args) {

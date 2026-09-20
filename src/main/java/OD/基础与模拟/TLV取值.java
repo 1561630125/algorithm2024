@@ -1,5 +1,7 @@
 package OD.基础与模拟;
 
+import java.util.Arrays;
+
 /**
  * description
  *
@@ -21,7 +23,7 @@ public class TLV取值 {
      * @param stream 包含TLV数据的字符串数组，每个元素为一个十六进制字节（如 "9F", "02", "00", "06"）
      * @return 如果找到匹配标签，返回该标签对应的值部分（子数组）；否则返回空数组
      */
-    String[] decodeTlvValue(String tag, String[] stream) {
+    static String[] decodeTlvValue(String tag, String[] stream) {
         int index = 0; // 当前解析位置，指向TLV条目的起始标签位置
 
         // 遍历整个字节流，逐个处理TLV条目
@@ -62,7 +64,9 @@ public class TLV取值 {
 
 
     public static void main(String[] args) {
-
+        String tag = "31";
+        String[] stream = new String[]{"32", "1", "0", "AE", "90", "2", "0", "1", "2", "30", "3", "0", "AB", "32", "31", "31", "2", "0", "32", "33", "33", "1", "0", "CC"};
+        System.out.println(Arrays.toString(decodeTlvValue(tag, stream)));
     }
 
 }

@@ -1,7 +1,10 @@
 package OD.数据结构与区间;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 /**
- * description
+ * 考点：栈
  *
  * @author faming.yang@hand-china.com 2026-09-09 18:01
  */
@@ -66,6 +69,69 @@ public class 岛路逃生 {
         }
 
         return size;  // 栈中元素数量 = 生存人数
+    }
+
+    class Solution {
+
+        /**
+         * 统计"岛屿幸存者"数量。
+         * <p>
+         * people[i] > 0：向右走的人，强度 = people[i]
+         * people[i] < 0：向左走的人，强度 = -people[i]
+         * people[i] = 0：非法输入，返回 -1
+         * <p>
+         * 碰撞规则（只有向右与向左相遇才碰撞）：
+         * 右侧更强 → 左侧消失，右侧减损
+         * 左侧更强 → 右侧消失，左侧继续撞
+         * 相等     → 双方消失
+         *
+         * @param people 人群数组
+         * @return 幸存者数量；非法输入返回 -1
+         */
+        int countIslandSurvivors(int[] people) {
+
+            if (people.length == 0)
+                return -1;
+
+            // 用 Deque 当栈：存"当前向右走的幸存者"
+            Deque<Integer> stack = new ArrayDeque<>();
+
+            for (int value : people) {
+
+                // 值为 0 → 非法输入
+                if (value == 0)
+                    return -1;
+
+                int current = value;   // 当前正在处理的人（可能连续碰撞后变化）
+
+                // 当前是"向左"且栈顶是"向右" → 发生碰撞
+                while (current < 0 && !stack.isEmpty() && stack.peek() > 0) {
+                    int rightStrength = stack.peek();   // 栈顶：最右边的向右者
+                    int leftStrength = -current;        // 当前向左者的强度
+
+                    if (rightStrength > leftStrength) {
+                        // 右侧赢：右侧减损，左侧消失
+                        stack.pop();
+                        stack.push(rightStrength - leftStrength);
+                        current = 0;                    // 当前向左者没了
+                    } else if (rightStrength < leftStrength) {
+                        // 左侧赢：右侧消失，左侧继续撞下一个
+                        stack.pop();
+                        current = -(leftStrength - rightStrength);   // 更新当前向左者强度
+                    } else {
+                        // 同归于尽
+                        stack.pop();
+                        current = 0;
+                    }
+                }
+
+                // 若当前人还在（没被消灭），入栈
+                if (current != 0)
+                    stack.push(current);
+            }
+
+            return stack.size();
+        }
     }
 
 }

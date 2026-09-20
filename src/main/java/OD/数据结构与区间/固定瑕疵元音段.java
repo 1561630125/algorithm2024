@@ -3,7 +3,7 @@ package OD.数据结构与区间;
 import java.util.Locale;
 
 /**
- * description
+ * 考点：滑动窗口
  *
  * @author faming.yang@hand-china.com 2026-09-09 21:08
  */

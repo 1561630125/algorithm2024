@@ -4,7 +4,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 /**
- * description
+ * 考点：栈
  *
  * @author faming.yang@hand-china.com 2026-09-09 17:03
  */

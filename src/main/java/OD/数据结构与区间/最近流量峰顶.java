@@ -1,6 +1,8 @@
 package OD.数据结构与区间;
 
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Deque;
 
 /**
  * description
@@ -80,8 +82,56 @@ public class 最近流量峰顶 {
         return best == count + 1 ? -1 : best;
     }
 
+    static int minPeakSpan2(int[] samples) {
+        int count = samples.length;
+        if (count < 3) return -1;
+
+        int[] left = new int[count];
+        int[] right = new int[count];
+        Arrays.fill(left, -1);
+        Arrays.fill(right, -1);
+
+        // 用 Deque 当栈：push/pop/peek 都在同一端（栈顶）
+        Deque<Integer> stack = new ArrayDeque<>();
+
+        // ========== 第一次遍历：从左向右，计算 left[i] ==========
+        for (int index = 0; index < count; index++) {
+            // 弹出所有 >= samples[index] 的元素（相等不算“小于”）
+            while (!stack.isEmpty() && samples[stack.peek()] >= samples[index]) {
+                stack.pop();
+            }
+            // 栈顶就是左侧最近的小于 samples[index] 的元素
+            if (!stack.isEmpty()) {
+                left[index] = stack.peek();
+            }
+            stack.push(index);
+        }
+
+        // ========== 第二次遍历：从右向左，计算 right[i] ==========
+        stack.clear();
+        for (int index = count - 1; index >= 0; index--) {
+            while (!stack.isEmpty() && samples[stack.peek()] >= samples[index]) {
+                stack.pop();
+            }
+            if (!stack.isEmpty()) {
+                right[index] = stack.peek();
+            }
+            stack.push(index);
+        }
+
+        // ========== 第三步：遍历所有元素，计算最小跨度 ==========
+        int best = count + 1;
+        for (int index = 0; index < count; index++) {
+            if (left[index] >= 0 && right[index] >= 0) {
+                best = Math.min(best, right[index] - left[index]);
+            }
+        }
+
+        return best == count + 1 ? -1 : best;
+    }
+
     public static void main(String[] args) {
-        System.out.println(minPeakSpan(new int[]{1,2,3,4,5}));
+        System.out.println(minPeakSpan(new int[]{1, 2, 3, 4, 5}));
     }
 
 

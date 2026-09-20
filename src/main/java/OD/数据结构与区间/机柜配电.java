@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * description
+ * 考点：滑动窗口
  *
  * @author faming.yang@hand-china.com 2026-09-10 14:05
  */

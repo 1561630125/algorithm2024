@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 /**
- * description
+ * 考点：滑动窗口
  *
  * @author faming.yang@hand-china.com 2026-09-09 23:18
  */

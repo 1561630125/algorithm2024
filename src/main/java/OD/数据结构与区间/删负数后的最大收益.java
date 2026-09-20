@@ -3,13 +3,13 @@ package OD.数据结构与区间;
 import java.util.*;
 
 /**
- * description
+ * 考点：线段树
  *
  * @author faming.yang@hand-china.com 2026-09-12 22:40
  */
 public class 删负数后的最大收益 {
 
-    public class Solution {
+    static public class Solution {
 
         // 用"极小值 / 4"作为负无穷，避免加法溢出
         private static final long NEGATIVE_INFINITY = Long.MIN_VALUE / 4;
@@ -528,6 +528,252 @@ public class 删负数后的最大收益 {
             }
             return sum;
         }
+    }
+
+    // discardLimit = 0，滑动窗口 + 前缀和
+    public class SolutionV1 {
+        public long maximumHerbEnergy(int[] values, int required, int discardLimit) {
+            int n = values.length;
+            if (required < 1 || required > n || discardLimit != 0)
+                return -1;
+
+            // 记录正数下标
+            int[] positives = new int[n];
+            int positiveCount = 0;
+            long[] prefix = new long[n + 1];
+            for (int i = 0; i < n; i++) {
+                prefix[i + 1] = prefix[i] + values[i];
+                if (values[i] > 0) positives[positiveCount++] = i;
+            }
+            if (positiveCount < required) return -1;
+
+            long answer = Long.MIN_VALUE;
+            int seen = 0;
+            for (int right = 0; right < n; right++) {
+                if (values[right] <= 0) continue;  // 只关心正数
+                seen++;
+                if (seen < required) continue;
+
+                // 保证恰好 required 个正数的最左边界
+                int left = positives[seen - required];
+                long sum = prefix[right + 1] - prefix[left];
+                answer = Math.max(answer, sum);
+            }
+            return answer == Long.MIN_VALUE ? -1 : answer;
+        }
+    }
+
+    // 加入 DP，让 discardLimit 参与
+    public class SolutionV2 {
+        private static final long NEG = Long.MIN_VALUE / 4;
+
+        public long maximumHerbEnergy(int[] values, int required, int discardLimit) {
+            int n = values.length;
+            if (required < 1 || required > n || discardLimit < 0)
+                return -1;
+
+            int[] positives = new int[n];
+            int positiveCount = 0;
+            long[] prefix = new long[n + 1];
+            for (int i = 0; i < n; i++) {
+                prefix[i + 1] = prefix[i] + values[i];
+                if (values[i] > 0) positives[positiveCount++] = i;
+            }
+            if (positiveCount < required) return -1;
+
+            // ending[budget] = 以当前位置结尾、已丢弃 budget 个负数时的最大能量
+            long[] ending = new long[discardLimit + 1];
+            java.util.Arrays.fill(ending, NEG);
+            ending[0] = 0;
+
+            long answer = NEG;
+            int seen = 0;
+
+            for (int i = 0; i < n; i++) {
+                long[] next = new long[discardLimit + 1];
+                java.util.Arrays.fill(next, NEG);
+
+                for (int budget = 0; budget <= discardLimit; budget++) {
+                    // 保留当前值
+                    if (ending[budget] != NEG)
+                        next[budget] = ending[budget] + values[i];
+                    // 丢弃当前值（仅负数）
+                    if (values[i] < 0 && budget > 0 && ending[budget - 1] != NEG)
+                        next[budget] = Math.max(next[budget], ending[budget - 1]);
+                }
+
+                // 如果当前是正数且达到 required，尝试以 left 为起点的窗口
+                if (values[i] > 0 && ++seen >= required) {
+                    int left = positives[seen - required];
+                    long base = prefix[i + 1] - prefix[left];
+                    // 阶段 2 先不处理丢弃，直接拿 base 更新
+                    next[discardLimit] = Math.max(next[discardLimit], base);
+                }
+
+                ending = next;
+                answer = Math.max(answer, ending[discardLimit]);
+            }
+            return answer == NEG ? -1 : answer;
+        }
+    }
+
+    // 暴力排序找最小负数
+    public class SolutionV3 {
+        private static final long NEG = Long.MIN_VALUE / 4;
+
+        public long maximumHerbEnergy(int[] values, int required, int discardLimit) {
+            int n = values.length;
+            if (required < 1 || required > n || discardLimit < 0)
+                return -1;
+
+            int[] positives = new int[n];
+            int positiveCount = 0;
+            long[] prefix = new long[n + 1];
+            for (int i = 0; i < n; i++) {
+                prefix[i + 1] = prefix[i] + values[i];
+                if (values[i] > 0) positives[positiveCount++] = i;
+            }
+            if (positiveCount < required) return -1;
+
+            long[] ending = new long[discardLimit + 1];
+            java.util.Arrays.fill(ending, NEG);
+            ending[0] = 0;
+
+            long answer = NEG;
+            int seen = 0;
+
+            for (int i = 0; i < n; i++) {
+                long[] next = new long[discardLimit + 1];
+                java.util.Arrays.fill(next, NEG);
+
+                // DP 转移
+                for (int budget = 0; budget <= discardLimit; budget++) {
+                    if (ending[budget] != NEG)
+                        next[budget] = ending[budget] + values[i];
+                    if (values[i] < 0 && budget > 0 && ending[budget - 1] != NEG)
+                        next[budget] = Math.max(next[budget], ending[budget - 1]);
+                }
+
+                // 窗口 + 暴力找最小负数
+                if (values[i] > 0 && ++seen >= required) {
+                    int left = positives[seen - required];
+                    long base = prefix[i + 1] - prefix[left];
+
+                    // 收集窗口内所有负数，升序排序
+                    java.util.List<Long> negatives = new java.util.ArrayList<>();
+                    for (int k = left; k <= i; k++)
+                        if (values[k] < 0) negatives.add((long) values[k]);
+                    java.util.Collections.sort(negatives);
+
+                    long removedSum = 0;
+                    for (int budget = 0; budget <= discardLimit; budget++) {
+                        if (budget > 0 && budget <= negatives.size())
+                            removedSum += negatives.get(budget - 1);
+                        next[budget] = Math.max(next[budget], base - removedSum);
+                    }
+                }
+
+                ending = next;
+                answer = Math.max(answer, ending[discardLimit]);
+            }
+            return answer == NEG ? -1 : answer;
+        }
+    }
+
+
+    // 线段树替换暴力排序
+    public class SolutionV4 {
+        private static final long NEG = Long.MIN_VALUE / 4;
+
+        public long maximumHerbEnergy(int[] values, int required, int discardLimit) {
+            int n = values.length;
+            if (required < 1 || required > n || discardLimit < 0 || discardLimit > 5)
+                return -1;
+
+            int[] positives = new int[n];
+            int positiveCount = 0;
+            long[] prefix = new long[n + 1];
+            for (int i = 0; i < n; i++) {
+                prefix[i + 1] = prefix[i] + values[i];
+                if (values[i] > 0) positives[positiveCount++] = i;
+            }
+            if (positiveCount < required) return -1;
+
+            // ---------- 线段树构建 ----------
+            int size = 1;
+            while (size < n) size <<= 1;
+            long[][] tree = new long[size * 2][];
+            java.util.Arrays.fill(tree, new long[0]);
+            for (int i = 0; i < n; i++)
+                if (values[i] < 0) tree[size + i] = new long[]{values[i]};
+            for (int node = size - 1; node > 0; node--)
+                tree[node] = merge(tree[node * 2], tree[node * 2 + 1], discardLimit);
+
+            // ---------- DP ----------
+            long[] ending = new long[discardLimit + 1];
+            java.util.Arrays.fill(ending, NEG);
+            ending[0] = 0;
+
+            long answer = NEG;
+            int seen = 0;
+
+            for (int i = 0; i < n; i++) {
+                long[] next = new long[discardLimit + 1];
+                java.util.Arrays.fill(next, NEG);
+
+                // DP 转移
+                for (int budget = 0; budget <= discardLimit; budget++) {
+                    if (ending[budget] != NEG)
+                        next[budget] = ending[budget] + values[i];
+                    if (values[i] < 0 && budget > 0 && ending[budget - 1] != NEG)
+                        next[budget] = Math.max(next[budget], ending[budget - 1]);
+                }
+
+                // 线段树查询窗口内最小负数
+                if (values[i] > 0 && ++seen >= required) {
+                    int left = positives[seen - required];
+                    long base = prefix[i + 1] - prefix[left];
+
+                    long[] removed = new long[0];
+                    for (int l = left + size, r = i + size; l <= r; l >>= 1, r >>= 1) {
+                        if ((l & 1) == 1) removed = merge(removed, tree[l++], discardLimit);
+                        if ((r & 1) == 0) removed = merge(removed, tree[r--], discardLimit);
+                    }
+
+                    long removedSum = 0;
+                    for (int budget = 0; budget <= discardLimit; budget++) {
+                        if (budget > 0 && budget <= removed.length)
+                            removedSum += removed[budget - 1];
+                        next[budget] = Math.max(next[budget], base - removedSum);
+                    }
+                }
+
+                ending = next;
+                answer = Math.max(answer, ending[discardLimit]);
+            }
+            return answer == NEG ? -1 : answer;
+        }
+
+        /**
+         * 合并两个升序数组，只保留前 limit 个
+         */
+        private long[] merge(long[] left, long[] right, int limit) {
+            long[] result = new long[Math.min(limit, left.length + right.length)];
+            int a = 0, b = 0;
+            for (int i = 0; i < result.length; i++)
+                result[i] = (b >= right.length || (a < left.length && left[a] <= right[b]))
+                        ? left[a++] : right[b++];
+            return result;
+        }
+    }
+
+
+    public static void main(String[] args) {
+        Solution solution = new Solution();
+        int[] values = new int[]{-2, 4, -3};
+        int required = 1;
+        int discardLimit = 0;
+        System.out.println(solution.maximumHerbEnergy(values, required, discardLimit));
     }
 
 }

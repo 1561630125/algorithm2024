@@ -1,7 +1,7 @@
 package OD.数据结构与区间;
 
 /**
- * description
+ * 考点：滑动窗口+恰好
  *
  * @author faming.yang@hand-china.com 2026-09-08 15:58
  */
@@ -120,7 +120,10 @@ public class 十位数字子串 {
 
 
     public static void main(String[] args) {
-        String text= "aaa0123456789";
-        System.out.println(countMatchingSubstrings(text,2));
+        String text = "aaa0123456789";
+        System.out.println(countMatchingSubstrings(text, 2));
+
+        String text2 = "a0123456789b0";
+//        System.out.println(countMatchingSubstrings(text2, 2));/
     }
 }

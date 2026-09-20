@@ -498,6 +498,33 @@ public class 练习 {
         class so21 {
 
         }
+
+        // kmp next数组
+        class so22 {
+
+        }
+
+        // 进制转换
+        class so23 {
+
+        }
     }
+
+
+    // 进制转换
+    class so21 {
+
+    }
+
+    // Dijkstra
+    class so22 {
+
+    }
+
+    // 200分的题目
+    class so23 {
+
+    }
+
 
 }
