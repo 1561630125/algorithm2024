@@ -3,7 +3,7 @@ package OD.搜索与枚举;
 import java.util.ArrayDeque;
 
 /**
- * description
+ * 考点：BFS
  *
  * @author faming.yang@hand-china.com 2026-09-10 21:33
  */

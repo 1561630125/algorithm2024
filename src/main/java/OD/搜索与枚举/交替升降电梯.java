@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 /**
- * description
+ * 考点：递归+剪枝
  *
  * @author faming.yang@hand-china.com 2026-09-10 22:06
  */

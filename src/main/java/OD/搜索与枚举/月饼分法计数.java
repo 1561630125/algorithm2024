@@ -1,7 +1,7 @@
-package OD.数据结构与区间;
+package OD.搜索与枚举;
 
 /**
- * description
+ * 考点：递归  or 完全背包
  *
  * @author faming.yang@hand-china.com 2026-09-12 12:50
  */
@@ -119,4 +119,103 @@ public class 月饼分法计数 {
     }
 
 
+    class Solution2 {
+        long countMooncakeDistributions(int employees, int mooncakes) {
+            // 无员工，或月饼不够每人分 1 个 → 无法分配
+            if (employees <= 0 || mooncakes < employees)
+                return 0;
+
+            // 只有 1 个人，所有月饼都归他，方案数唯一
+            if (employees == 1)
+                return 1;
+
+            // 先给每人分 1 个，剩下的 remaining 个自由分配
+            // 问题转化为：把 remaining 拆成若干份，每份对应"多给某人几个"
+            int remaining = mooncakes - employees;
+
+            // ways[t] = 把 t 个额外月饼分出去的方案数
+            long[] ways = new long[remaining + 1];
+            ways[0] = 1;   // 0 个额外月饼只有 1 种分法（谁都不多给）
+
+            // 枚举"一份"的大小 weight（相当于完全背包里的物品重量）
+            // weight 最大不超过 remaining，也没必要超过 employees
+            for (int weight = 1; weight <= Math.min(employees, remaining); weight++) {
+
+                // 特殊分支：weight == 1 或 weight == employees-1 时，
+                // 该 weight 最多只能用 3 次（有界背包）
+                if (weight == 1 || weight == employees - 1) {
+
+                    long[] previous = ways;              // 保存旧状态
+                    ways = new long[remaining + 1];      // 开新数组，隔离本轮
+
+                    for (int total = 0; total <= remaining; total++) {
+                        // 枚举用几份 weight：0 ~ 3 份，且不能超过 total
+                        for (int copies = 0;
+                             copies <= 3 && copies * weight <= total;
+                             copies++) {
+
+                            // 从"没用过当前 weight 的旧状态"转移
+                            ways[total] += previous[total - copies * weight];
+                        }
+                    }
+                } else {
+                    // 普通分支：完全背包，weight 可以用无限次
+                    // 正序遍历 total → 允许重复使用当前 weight
+                    for (int total = weight; total <= remaining; total++)
+                        ways[total] += ways[total - weight];
+                }
+            }
+
+            // 返回：把 remaining 个额外月饼分完的方案数
+            return ways[remaining];
+        }
+    }
+
+
+    class Solution3 {
+        long countMooncakeDistributions(int employees, int mooncakes) {
+            if (employees <= 0 || mooncakes < employees)
+                return 0;
+            if (employees == 1)
+                return 1;
+
+            int remaining = mooncakes - employees;
+            int maxWeight = Math.min(employees, remaining);
+
+            // dp[i][j] = 用前 i 种"份大小"（weight 1..i），凑出 j 的方案数
+            long[][] dp = new long[maxWeight + 1][remaining + 1];
+
+            // 初始化：用 0 种份凑出 0，方案数为 1
+            for (int i = 0; i <= maxWeight; i++)
+                dp[i][0] = 1;
+
+            for (int i = 1; i <= maxWeight; i++) {
+                int weight = i;
+
+                // ===== 先继承上一层（不用当前 weight 的情况）=====
+                for (int total = 0; total <= remaining; total++)
+                    dp[i][total] = dp[i - 1][total];
+
+                if (weight == 1 || weight == employees - 1) {
+                    // ===== 有界：最多用 3 次 =====
+                    for (int total = 0; total <= remaining; total++) {
+                        for (int copies = 1;
+                             copies <= 3 && copies * weight <= total;
+                             copies++) {
+                            // 从"不用当前 weight"的上一层转移
+                            dp[i][total] += dp[i - 1][total - copies * weight];
+                        }
+                    }
+                } else {
+                    // ===== 无界：完全背包，可以用无限次 =====
+                    for (int total = weight; total <= remaining; total++) {
+                        // 注意：dp[i][total - weight] 是"同一行"，表示还能再用
+                        dp[i][total] += dp[i][total - weight];
+                    }
+                }
+            }
+
+            return dp[maxWeight][remaining];
+        }
+    }
 }

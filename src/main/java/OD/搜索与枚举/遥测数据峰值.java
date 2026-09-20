@@ -1,7 +1,7 @@
-package OD.数据结构与区间;
+package OD.搜索与枚举;
 
 /**
- * description
+ * 考点：时间窗口内的最大值
  *
  * @author faming.yang@hand-china.com 2026-09-13 16:56
  */

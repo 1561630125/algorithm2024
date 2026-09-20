@@ -1,7 +1,7 @@
 package OD.数据结构与区间;
 
 /**
- * description
+ * 考点： 递归 or 枚举
  *
  * @author faming.yang@hand-china.com 2026-09-13 17:14
  */

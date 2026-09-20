@@ -1,7 +1,7 @@
 package OD.搜索与枚举;
 
 /**
- * description
+ * 考点：递归
  *
  * @author faming.yang@hand-china.com 2026-09-12 17:57
  */
@@ -95,6 +95,43 @@ public class 五人队战力差 {
 
             // ---------- 4. 返回结果 ----------
             // 若 best 仍为无穷大（理论上不会），返回 0 兜底
+            return best == Long.MAX_VALUE ? 0 : best;
+        }
+    }
+
+
+    class Solution2 {
+        private long total, best;
+
+        /**
+         * 从 start 开始，已经选了 taken 个，当前和为 current。
+         * 用 for 循环枚举"下一个选的元素"。
+         */
+        private void visit(long[] ratings, int start, int taken, long current) {
+            // 出口：已经选满 5 个
+            if (taken == 5) {
+                best = Math.min(best, Math.abs(total - 2 * current));
+                return;
+            }
+
+            // 剪枝：剩下的数全选也不够 5 个
+            if (taken + ratings.length - start < 5)
+                return;
+
+            // 用 for 循环枚举"下一个选的元素"
+            for (int i = start; i < ratings.length; i++) {
+                visit(ratings, i + 1, taken + 1, current + ratings[i]);
+            }
+        }
+
+        long minimumTeamStrengthDifference(long[] ratings) {
+            if (ratings.length < 5)
+                return 0;
+            total = 0;
+            for (long value : ratings)
+                total += value;
+            best = Long.MAX_VALUE;
+            visit(ratings, 0, 0, 0);   // 从下标 0 开始，还没选，和为 0
             return best == Long.MAX_VALUE ? 0 : best;
         }
     }

@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- * description
+ * 考点：BFS
  *
  * @author faming.yang@hand-china.com 2026-09-10 20:34
  */

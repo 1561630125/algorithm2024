@@ -1,7 +1,7 @@
-package OD.数据结构与区间;
+package OD.搜索与枚举;
 
 /**
- * description
+ * 考点：朴素暴力 或者滑动窗口
  *
  * @author faming.yang@hand-china.com 2026-09-12 18:15
  */

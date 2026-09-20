@@ -1,7 +1,7 @@
-package OD.数据结构与区间;
+package OD.搜索与枚举;
 
 /**
- * description
+ * 考点：递归
  *
  * @author faming.yang@hand-china.com 2026-09-12 17:12
  */
@@ -105,6 +105,11 @@ public class 递归双色字符 {
                 return !color(row - 1, position);
             }
         }
+
+        //R
+        //BR
+        //RBBR
+        //BRRBRBBR
 
         String[] symmetricColors(long[][] queries) {
             String[] result = new String[queries.length];

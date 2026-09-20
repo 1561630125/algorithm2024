@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * description
+ * 考点：二分答案 或者 递归
  *
  * @author faming.yang@hand-china.com 2026-09-11 16:24
  */

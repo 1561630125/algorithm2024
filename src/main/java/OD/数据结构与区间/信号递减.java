@@ -5,7 +5,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 /**
- * description
+ * 考点：多源BFS
  *
  * @author faming.yang@hand-china.com 2026-09-12 22:10
  */

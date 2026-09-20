@@ -1,7 +1,7 @@
 package OD.搜索与枚举;
 
 /**
- * description
+ * 考点：多源BFS
  *
  * @author faming.yang@hand-china.com 2026-09-11 16:11
  */

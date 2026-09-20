@@ -1,10 +1,10 @@
-package OD.数据结构与区间;
+package OD.搜索与枚举;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
 
 /**
- * description
+ * 考点：BFS
  *
  * @author faming.yang@hand-china.com 2026-09-11 22:38
  */

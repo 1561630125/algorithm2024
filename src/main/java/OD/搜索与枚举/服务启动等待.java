@@ -1,7 +1,7 @@
 package OD.搜索与枚举;
 
 /**
- * description
+ * 考点：递归+记忆化搜索
  *
  * @author faming.yang@hand-china.com 2026-09-10 20:20
  */

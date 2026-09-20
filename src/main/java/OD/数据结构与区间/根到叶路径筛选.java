@@ -2,7 +2,7 @@ package OD.数据结构与区间;
 
 
 /**
- * description
+ * 考点：栈
  *
  * @author faming.yang@hand-china.com 2026-09-12 22:31
  */
