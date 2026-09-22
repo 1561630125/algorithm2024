@@ -3,7 +3,7 @@ package OD.树与图;
 import java.util.*;
 
 /**
- * description
+ * 考点：字符串排序
  *
  * @author faming.yang@hand-china.com 2026-09-13 22:32
  */

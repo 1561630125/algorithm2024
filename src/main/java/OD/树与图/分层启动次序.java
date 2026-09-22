@@ -3,21 +3,21 @@ package OD.树与图;
 import java.util.*;
 
 /**
- * description
+ * 考点：DFS拓扑排序；入度
  *
  * @author faming.yang@hand-china.com 2026-09-14 14:02
  */
 public class 分层启动次序 {
 
-    class Solution {
+    static class Solution {
         /**
          * 根据任务依赖规则（rules），输出一个合法的启动顺序。
-         *
+         * <p>
          * 每条 rule 形如 "A->B"，表示 A 依赖 B（B 必须先启动，A 才能启动）。
          * 要求：
-         *   1. 同一批可启动的任务按字典序排序；
-         *   2. 返回拓扑排序结果；
-         *   3. 若存在循环依赖（无法全部启动），返回 {"ERROR"}。
+         * 1. 同一批可启动的任务按字典序排序；
+         * 2. 返回拓扑排序结果；
+         * 3. 若存在循环依赖（无法全部启动），返回 {"ERROR"}。
          */
         String[] startupTaskOrder(String[] rules) {
             // nodes：所有出现过的任务节点
@@ -175,9 +175,12 @@ public class 分层启动次序 {
 
     public static void main(String[] args) {
         Solution2 solution2 = new Solution2();
-        String[] rules = new String[]{"C->A","B->A","D->B"};
+        String[] rules = new String[]{"C->A", "B->A", "D->B"};
 
+
+        Solution solution = new Solution();
         System.out.println(Arrays.toString(solution2.startupTaskOrder(rules)));
+        System.out.println(Arrays.toString(solution.startupTaskOrder(rules)));
     }
 
 }

@@ -1,7 +1,7 @@
 package OD.树与图;
 
 /**
- * description
+ * 考点：并查集
  *
  * @author faming.yang@hand-china.com 2026-09-14 14:47
  */

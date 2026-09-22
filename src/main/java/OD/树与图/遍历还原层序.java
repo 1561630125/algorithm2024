@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Queue;
 
 /**
- * description
+ * 考点：层序遍历
  *
  * @author faming.yang@hand-china.com 2026-09-14 13:37
  */
