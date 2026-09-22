@@ -1,7 +1,7 @@
 package OD.贪心和动态规划;
 
 /**
- * description
+ * 考点：01背包
  *
  * @author faming.yang@hand-china.com 2026-09-15 19:42
  */

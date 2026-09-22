@@ -1,7 +1,7 @@
 package OD.贪心和动态规划;
 
 /**
- * description
+ * 考点：状态机 DP
  *
  * @author faming.yang@hand-china.com 2026-09-15 19:25
  */

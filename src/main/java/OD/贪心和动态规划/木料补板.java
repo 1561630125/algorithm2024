@@ -1,7 +1,7 @@
 package OD.贪心和动态规划;
 
 /**
- * description
+ * 考点：贪心 + 排序
  *
  * @author faming.yang@hand-china.com 2026-09-15 16:44
  */
@@ -68,6 +68,38 @@ public class 木料补板 {
             // 所有木板都已被垫平（index == values.length），
             // 剩余木料平均分给全部木板，得到最终统一高度
             return current + extraWood / values.length;
+        }
+    }
+
+
+    class Solution2 {
+        public long maximumMinimumBoardLength(long[] boards, long extraWood) {
+            if (boards.length == 0) return 0;
+
+            long lo = Long.MAX_VALUE;
+            for (long b : boards) lo = Math.min(lo, b);
+            long hi = lo + extraWood;
+
+            while (lo < hi) {
+                long mid = lo + (hi - lo + 1) / 2;
+                if (canMake(boards, extraWood, mid)) {
+                    lo = mid;
+                } else {
+                    hi = mid - 1;
+                }
+            }
+            return lo;
+        }
+
+        private boolean canMake(long[] boards, long extraWood, long L) {
+            long cost = 0;
+            for (long b : boards) {
+                if (b < L) {
+                    cost += L - b;
+                    if (cost > extraWood) return false;
+                }
+            }
+            return cost <= extraWood;
         }
     }
 
